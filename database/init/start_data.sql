@@ -17,9 +17,9 @@ INSERT INTO supplier (supplier_id, sup_name, contact_info, requisites, sup_statu
 
 INSERT INTO characteristic (characteristic_id, category_id, value_type, charac_name, is_required, unit) OVERRIDING SYSTEM VALUE VALUES
 (1, 1, 'TEXT', 'Сокет', TRUE, NULL),
-(2, 1, 'NUMERIC', 'TDP', TRUE, 'Вт'),
-(3, 6, 'NUMERIC', 'Частота', TRUE, 'МГц'),
-(4, 7, 'NUMERIC', 'Частота', TRUE, 'МГц');
+(2, 1, 'NUMERIC', 'TDP', TRUE, 'W'),
+(3, 6, 'NUMERIC', 'Частота', TRUE, 'MHz'),
+(4, 7, 'NUMERIC', 'Частота', TRUE, 'MHz');
 
 INSERT INTO compability_rule (rule_id, category_id, comp_name, argument_1, comparator, argument_2, related_category_id, comp_status) OVERRIDING SYSTEM VALUE VALUES
 (1, 1, 'CPU_MOBO_SOCKET_CHECK', 'socket', '=', 'socket', 4, 'active');
