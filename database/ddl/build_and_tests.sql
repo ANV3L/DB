@@ -3,12 +3,12 @@ CREATE TABLE sale (
     sale_id INT GENERATED ALWAYS AS IDENTITY,
     order_id INT NOT NULL,
     build_id INT NOT NULL,
-    sale_number TEXT NOT NULL,
+    sale_number VARCHAR(80) NOT NULL,
     sale_date DATE NOT NULL DEFAULT CURRENT_DATE,
-    customer_name TEXT NOT NULL,
-    sale_cost INT NOT NULL CHECK (sale_cost >= 0),
+    customer_name VARCHAR(80) NOT NULL,
+    sale_cost NUMERIC(12,2) NULL CHECK (sale_cost >= 0),
     responsible_person TEXT,
-    sale_status TEXT NOT NULL DEFAULT 'completed',
+    sale_status VARCHAR(80) NOT NULL DEFAULT 'completed',
     CONSTRAINT pk_sale PRIMARY KEY (sale_id),
     CONSTRAINT uk_sale_number UNIQUE (sale_number),
     CONSTRAINT fk_sale_order
@@ -26,13 +26,14 @@ CREATE TABLE warranty_claim (
     sale_id INT NOT NULL,
     build_id INT NOT NULL,
     exemplar_id INT NOT NULL,
-    warr_number TEXT NOT NULL,
+    warr_number VARCHAR(80) NOT NULL,
     warr_description TEXT,
     warranty_terms TEXT,
-    warr_status TEXT NOT NULL DEFAULT 'open',
+    warr_status VARCHAR(20) NOT NULL DEFAULT 'open' CHECK (warr_status IN ('open', 'in_progress', 'resolved', 'rejected', 'closed')),
     reason TEXT,
     claim_date DATE NOT NULL DEFAULT CURRENT_DATE,
-    customer_name TEXT,
+    customer_name VARCHAR(150),
+
     CONSTRAINT pk_claim PRIMARY KEY (claim_id),
     CONSTRAINT uk_warranty_claim_number UNIQUE (warr_number),
     CONSTRAINT fk_warranty_claim_sale
@@ -52,6 +53,7 @@ CREATE TABLE warranty_claim (
 CREATE TABLE sale_item (
     exemplar_id INT NOT NULL,
     sale_id INT NOT NULL,
+
     CONSTRAINT pk_sale_item PRIMARY KEY (exemplar_id, sale_id),
     CONSTRAINT fk_sale_item_exemplar
         FOREIGN KEY (exemplar_id)
