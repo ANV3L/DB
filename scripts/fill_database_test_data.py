@@ -1,370 +1,389 @@
+import os
 import random
-from datetime import datetime, timedelta
 
-E1_MODELS_QUANTITY = 25
-E2_CATEGORIES_QUANTITY = 9
-E3_CHARACTERISTICS_QUANTITY = 6
-E4_CHAR_VALUES_QUANTITY = 35
-E5_COMP_RULES_QUANTITY = 3
-E6_SUPPLIERS_QUANTITY = 4
-E7_SUPPLIES_QUANTITY = 5
-E8_BATCHES_QUANTITY = 15
-E9_EXEMPLARS_QUANTITY = 60
-E10_ORDERS_QUANTITY = 10
-E11_CONFIGS_QUANTITY = 10
-E12_CONFIG_COMPS_QUANTITY = 15
-E13_RESERVATIONS_QUANTITY = 10
-E14_BUILDS_QUANTITY = 8
-E15_TESTS_QUANTITY = 8
-E16_TEST_RESULTS_QUANTITY = 8
-E17_SALES_QUANTITY = 6
-E18_WARRANTY_CLAIMS_QUANTITY = 2
-E19_BATCH_ITEMS_QUANTITY = 15
-E20_BUILD_ITEMS_QUANTITY = 8
-E21_SALE_ITEMS_QUANTITY = 6
+# Путь к файлу результата
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUTPUT_SQL_PATH = os.path.join(BASE_DIR, "database", "init", "generated_test_data.sql")
 
-OUTPUT_SQL_PATH = "database/init/generated_test_data.sql"
+# Теперь можно смело ставить любое количество строк без риска дубликатов
+COUNTS = {
+    'E1': 1000,
+    'E2': 1000, 
+    'E3': 1000,
+    'E4': 1000,
+    'E5': 1000,
+    'E6': 1000, 
+    'E7': 1000, 
+    'E8': 1000, 
+    'E9': 1000, 
+    'E10': 1000,
+    'E11': 1000, 
+    'E12': 1000, 
+    'E13': 1000, 
+    'E14': 1000, 
+    'E15': 1000,
+    'E16': 1000, 
+    'E17': 1000, 
+    'E18': 1000, 
+    'E19': 1000, 
+    'E20': 1000, 
+    'E21': 1000
+}
+
+# Расширенные статические пулы данных для всех сущностей (E1 - E18)
+
+POOLS_E1 = {
+    "comp_name": [
+        "Core i7-14700K", "Ryzen 7 7800X3D", "RTX 4070 OC", "RX 7800 XT", "Fury Beast 32GB", 
+        "Vengeance 32GB", "990 PRO 1TB", "SN850X 1TB", "PK750D 750W", "RM850x 850W",
+        "Core i5-13600K", "Ryzen 5 7600X", "RTX 4080 Super", "RX 7900 XTX", "Dominator Platinum",
+        "Trident Z5 RGB", "T700 2TB", "P5 Plus 2TB", "HX1000i 1000W", "System Power 10",
+        "Pure Power 12 M", "TUF Gaming Z790", "ROG Strix X670E", "MAG B650 Tomahawk", "PRIME H610M-E",
+        "MP500 CPU Cooler", "AK620 Digital", "Peerless Assassin 120", "Liquid Freezer III 360", "H6 Flow RGB",
+        "Lancool 216", "North Charcoal", "O11 Dynamic EVO", "Odyssey G7", "TUF Gaming VG27AQ",
+        "UltraGear 27GP850", "BlackWidow V4", "DeathAdder V3", "G Pro X Superlight", "K70 MAX",
+        "Apex Pro TKL", "Cloud III Wireless", "Virtuoso RGB", "Huntsman V3 Pro", "G915 Lightspeed",
+        "Basilisk V3 Pro", "Viper V2 Pro", "Pro X TKL", "Ornata V3", "Cynosa V2"
+    ],
+    "manufacturer": [
+        "Intel", "AMD", "NVIDIA", "Kingston", "Corsair", "Samsung", "WD", "DeepCool", "MSI", "Gigabyte",
+        "ASUS", "AsRock", "BeQuiet", "Seasonic", "Toshiba", "Crucial", "G.Skill", "Thermalright", "Arctic", "NZXT",
+        "Lian Li", "Fractal Design", "Samsung", "LG", "AOC", "Razer", "Logitech", "SteelSeries", "HyperX", "Corsair",
+        "Intel", "AMD", "NVIDIA", "Kingston", "Corsair", "Samsung", "WD", "DeepCool", "MSI", "Gigabyte",
+        "ASUS", "AsRock", "BeQuiet", "Seasonic", "Toshiba", "Crucial", "G.Skill", "Thermalright", "Arctic", "NZXT"
+    ],
+    "price": [round(5000.0 + i * 45.5, 2) for i in range(1000)], # 1000 числовых вариантов
+    "warranty_period": [12, 24, 36, 60, 120, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12, 24, 36, 60, 12]
+}
+
+POOLS_E2 = {
+    "cat_name": [f"Категория оборудования №{i}" for i in range(1, 51)],
+    "cat_description": [f"Техническое описание спецификации и группы устройств #{i} для сборки" for i in range(1, 51)]
+}
+
+POOLS_E3 = {
+    "value_type": ["TEXT", "NUMERIC", "TEXT", "NUMERIC", "TEXT", "NUMERIC", "TEXT", "NUMERIC", "TEXT", "NUMERIC"],
+    "charac_name": [f"Параметр характеристики элемента конфигурации {i}" for i in range(1, 51)],
+    "is_required": [True, False, True, True, False, True, False, True, False, True],
+    "unit": [None, "MB", "MHz", "W", "mm", "kg", "V", "A", "GHz", None]
+}
+
+POOLS_E5 = {
+    "comp_name": [f"RULE_COMPATIBILITY_CHECK_UNIT_{i}" for i in range(1, 51)],
+    "argument_1": ["socket", "memory_type", "total_tdp", "pci_version", "m2_slots", "freq", "vram", "power", "slots", "size"],
+    "comparator": ["=", "<=", ">=", "=", "<", ">", "!=", "=", "<=", ">="],
+    "argument_2": ["socket", "memory_type", "max_power", "pci_version", "m2_slots", "freq", "vram", "power", "slots", "size"],
+    "comp_status": ["active", "deprecated", "draft", "active", "active", "deprecated", "active", "draft", "active", "active"]
+}
+
+POOLS_E6 = {
+    "sup_name": [f"ООО Поставщик-Партнер Техно Групп #{i}" for i in range(1, 51)],
+    "contact_info": [f"b2b_sales_department_code_{i}@hardware-store.ru" for i in range(1, 51)],
+    "requisites": [f"ИНН 77{i:08d} ОГРН 1157746{i:05d}" for i in range(1, 1000)], # 1000 вариантов
+    "sup_status": ["active", "active", "active", "inactive", "blacklisted", "active", "active", "inactive", "active", "active"]
+}
+
+POOLS_E7 = {
+    "responsible_person": [f"Старший логист смены складского комплекса №{i}" for i in range(1, 51)],
+    "sup_status": ["created", "in_transit", "delivered", "cancelled", "delivered", "created", "delivered", "in_transit", "delivered", "created"],
+    "sup_comment": [None] + [f"Партия груза оформлена штатно по транспортной накладной #{i}" for i in range(1, 51)]
+}
+
+POOLS_E8 = {
+    "batch_status": ["received", "depleted", "written_off", "received", "received", "depleted", "received", "received", "received", "written_off"]
+}
+
+POOLS_E9 = {
+    "exemp_location": [f"Складской распределительный комплекс Юг, Зона {chr(65 + i%5)}, Стеллаж Ряд-{i}" for i in range(1, 51)],
+    "exemp_status": ["in_stock", "reserved", "sold", "defective", "written_off", "in_stock", "sold", "reserved", "in_stock", "defective"]
+}
+
+POOLS_E10 = {
+    "responsible_person": [f"Менеджер отдела по работе с клиентами №{i}" for i in range(1, 51)],
+    "cust_status": ["new", "processing", "assembled", "completed", "cancelled", "new", "processing", "completed", "assembled", "new"],
+    "cust_comment": [None] + [f"Самовывоз клиентом со склада после предварительной проверки заказа #{i}" for i in range(1, 51)],
+    "customer_name": [f"Покупатель Физическое Лицо Профиль №{i}" for i in range(1, 51)],
+    "contact_info": [f"client_corporate_mail_box_{i}@yandex.ru" for i in range(1, 51)]
+}
+
+POOLS_E11 = {
+    "component_list": [f'{{"config_node_id": {i}, "status": "verified", "tier": "high-end"}}' for i in range(1, 51)],
+    "build_status": ["draft", "verified", "approved", "assembled", "archived", "draft", "verified", "approved", "assembled", "archived"],
+    "compatibility_check_result": ['{"ok": true}', '{"ok": false}', '{"ok": true}', '{"ok": true}', '{"ok": false}']
+}
+
+POOLS_E13 = {
+    "exemp_status": ["active", "expired", "fulfilled", "cancelled", "active", "active", "fulfilled", "expired", "active", "cancelled"]
+}
+
+POOLS_E14 = {
+    "installed_components": ['{"cpu": true, "gpu": true, "ram": true, "psu": true}', '{"status": "fully_mounted"}'],
+    "assembler": [f"Сертифицированный инженер-сборщик ПК лаборатории №{i}" for i in range(1, 51)],
+    "build_status": ["in_progress", "assembled", "testing_passed", "testing_failed", "completed"],
+    "build_comment": [None] + [f"Сборка протестирована на стенде, параметры стабильны, код проверки #{i}" for i in range(1, 51)]
+}
+
+POOLS_E15 = {
+    "test_status": ["pending", "running", "passed", "failed", "error", "passed", "passed", "running", "passed", "passed"],
+    "build_comment": [None] + [f"Стресс-тест стабильности пройден с запасом по температуре чипа #{i}" for i in range(1, 51)]
+}
+
+POOLS_E16 = {
+    "test_name": [f"Benchmark Diagnostic Stress Suite Profile v{i}.0 Ultimate Edition" for i in range(1, 51)],
+    "test_status": ["pending", "passed", "failed", "skipped", "warning", "passed", "passed", "passed", "passed", "passed"]
+}
+
+POOLS_E17 = {
+    "customer_name": [f"Заказчик Розничной Сети Покупатель #{i}" for i in range(1, 51)],
+    "responsible_person": [f"Менеджер оформления финансовых документов №{i}" for i in range(1, 51)],
+    "sale_status": ["completed", "completed", "completed", "completed", "completed", "completed", "completed", "completed", "completed", "completed"]
+}
+
+POOLS_E18 = {
+    "warr_description": [f"Дефект аппаратного узла подсистемы питания или графического чипа код рекламации #{i}" for i in range(1, 51)],
+    "warranty_terms": [f"Расширенный гарантийный сервисный сертификат сроком действия {i} месяцев" for i in range(1, 51)],
+    "warr_status": ["open", "in_progress", "resolved", "rejected", "closed", "open", "in_progress", "resolved", "closed", "open"],
+    "reason": [f"Отказ элемента силовой схемы из-за скачка напряжения в сети, кейс #{i}" for i in range(1, 51)],
+    "customer_name": [f"Заявитель Претензии Клиент #{i}" for i in range(1, 51)]
+}
 
 def esc(val):
-    """Экранирование одинарных кавычек для SQL"""
     if val is None:
         return "NULL"
-    return str(val).replace("'", "''")
+    if isinstance(val, str):
+        return f"'{val.replace('\'', '\'\'')}'"
+    return str(val)
+
+# ==========================================
+# ФУНКЦИИ ГЕНЕРАЦИИ С ДИНАМИЧЕСКИМИ UNIQUE ПОЛЯМИ
+# ==========================================
+
+def generate_E1_row(i):
+    cat_id = ((i - 1) % COUNTS['E2']) + 1
+    articul = f"ART-{i:05d}" # Гарантированно уникально
+    name = POOLS_E1["comp_name"][(i - 1) % len(POOLS_E1["comp_name"])]
+    mfr = POOLS_E1["manufacturer"][(i - 1) % len(POOLS_E1["manufacturer"])]
+    price = POOLS_E1["price"][(i - 1) % len(POOLS_E1["price"])] + (i * 10)
+    warr = POOLS_E1["warranty_period"][(i - 1) % len(POOLS_E1["warranty_period"])]
+    return f"({i}, {cat_id}, '{articul}', '{name} #{i}', '{mfr}', {price}, {warr})"
+
+def generate_E2_row(i):
+    parent = None if i <= 5 else ((i - 6) % 5) + 1
+    parent_val = parent if parent is not None else "NULL"
+    cat_code = f"CAT-{i:03d}" # Уникальный код категории
+    name = POOLS_E2["cat_name"][(i - 1) % len(POOLS_E2["cat_name"])]
+    desc = POOLS_E2["cat_description"][(i - 1) % len(POOLS_E2["cat_description"])]
+    return f"({i}, {parent_val}, '{cat_code}', '{name} {i}', '{desc}')"
+
+def generate_E3_row(i):
+    cat_id = ((i - 1) % COUNTS['E2']) + 1
+    vtype = POOLS_E3["value_type"][(i - 1) % len(POOLS_E3["value_type"])]
+    cname = POOLS_E3["charac_name"][(i - 1) % len(POOLS_E3["charac_name"])]
+    req = str(POOLS_E3["is_required"][(i - 1) % len(POOLS_E3["is_required"])]).upper()
+    unit = POOLS_E3["unit"][(i - 1) % len(POOLS_E3["unit"])]
+    unit_val = esc(unit) if unit is not None else "NULL"
+    return f"({i}, {cat_id}, '{vtype}', '{cname} #{i}', {req}, {unit_val})"
+
+def generate_E4_row(i):
+    m_id = ((i - 1) % COUNTS['E1']) + 1
+    c_id = ((i - 1) % COUNTS['E3']) + 1
+    val = round(100.0 + i * 1.5, 3)
+    return f"({m_id}, {c_id}, {val})"
+
+def generate_E5_row(i):
+    cat_id = ((i - 1) % COUNTS['E2']) + 1
+    cname = POOLS_E5["comp_name"][(i - 1) % len(POOLS_E5["comp_name"])]
+    arg1 = POOLS_E5["argument_1"][(i - 1) % len(POOLS_E5["argument_1"])]
+    comp = POOLS_E5["comparator"][(i - 1) % len(POOLS_E5["comparator"])]
+    arg2 = POOLS_E5["argument_2"][(i - 1) % len(POOLS_E5["argument_2"])]
+    rel_cat = ((i + 1) % COUNTS['E2']) + 1
+    status = POOLS_E5["comp_status"][(i - 1) % len(POOLS_E5["comp_status"])]
+    return f"({i}, {cat_id}, '{cname}_{i}', '{arg1}', '{comp}', '{arg2}', {rel_cat}, '{status}', '2026-01-01'::date, NULL, NULL)"
+
+def generate_E6_row(i):
+    name = POOLS_E6["sup_name"][(i - 1) % len(POOLS_E6["sup_name"])]
+    info = POOLS_E6["contact_info"][(i - 1) % len(POOLS_E6["contact_info"])]
+    reqs = f"ИНН 77{i:08d}" # Уникальные реквизиты/ИНН
+    status = POOLS_E6["sup_status"][(i - 1) % len(POOLS_E6["sup_status"])]
+    return f"({i}, '{name} #{i}', '{info}', '{reqs}', '{status}')"
+
+def generate_E7_row(i):
+    sup_id = ((i - 1) % COUNTS['E6']) + 1
+    cost = 100000 + i * 5000
+    resp = POOLS_E7["responsible_person"][(i - 1) % len(POOLS_E7["responsible_person"])]
+    status = POOLS_E7["sup_status"][(i - 1) % len(POOLS_E7["sup_status"])]
+    return f"({i}, {sup_id}, '2026-03-01'::date, {cost}, '{resp}', '{status}', 'Поставка #{i}')"
+
+def generate_E8_row(i):
+    m_id = ((i - 1) % COUNTS['E1']) + 1
+    sup_id = ((i - 1) % COUNTS['E7']) + 1
+    qty = 50
+    status = POOLS_E8["batch_status"][(i - 1) % len(POOLS_E8["batch_status"])]
+    price = 20000.0 + i * 100
+    return f"({i}, {m_id}, {sup_id}, '2026-03-02'::date, {qty}, '{status}', {price}, {qty})"
+
+def generate_E9_row(i):
+    batch_id = ((i - 1) % COUNTS['E8']) + 1
+    serial = f"SN-{1000000 + i}" # Уникальный серийный номер
+    loc = POOLS_E9["exemp_location"][(i - 1) % len(POOLS_E9["exemp_location"])]
+    status = POOLS_E9["exemp_status"][(i - 1) % len(POOLS_E9["exemp_status"])]
+    return f"({i}, {batch_id}, '{serial}', '2026-03-03'::date, '{loc}', '{status}')"
+
+def generate_E10_row(i):
+    cfg_id = ((i - 1) % COUNTS['E11']) + 1
+    cust_num = f"ORD-{i:05d}" # Уникальный номер заказа
+    resp = POOLS_E10["responsible_person"][(i - 1) % len(POOLS_E10["responsible_person"])]
+    cost = 75000 + i * 1000
+    status = POOLS_E10["cust_status"][(i - 1) % len(POOLS_E10["cust_status"])]
+    name = POOLS_E10["customer_name"][(i - 1) % len(POOLS_E10["customer_name"])]
+    contact = POOLS_E10["contact_info"][(i - 1) % len(POOLS_E10["contact_info"])]
+    return f"({i}, {cfg_id}, '{cust_num}', '2026-05-01'::date, '{resp}', {cost}, '{status}', NULL, '{name} #{i}', '{contact}')"
+
+def generate_E11_row(i):
+    prev = None if i <= 10 else i - 10
+    prev_val = prev if prev is not None else "NULL"
+    clist = POOLS_E11["component_list"][(i - 1) % len(POOLS_E11["component_list"])]
+    status = POOLS_E11["build_status"][(i - 1) % len(POOLS_E11["build_status"])]
+    ref = f"REF-{i:05d}" # Уникальная ссылка
+    chk = POOLS_E11["compatibility_check_result"][(i - 1) % len(POOLS_E11["compatibility_check_result"])]
+    return f"({i}, {prev_val}, '{clist}', '{status}', '{ref}', '{chk}')"
+
+def generate_E12_row(i):
+    cfg_id = ((i - 1) % COUNTS['E11']) + 1
+    model_id = ((i - 1) % COUNTS['E1']) + 1
+    return f"({i}, {cfg_id}, {model_id})"
+
+def generate_E13_row(i):
+    ex_id = ((i - 1) % COUNTS['E9']) + 1
+    comp_id = ((i - 1) % COUNTS['E12']) + 1
+    order_id = ((i - 1) % COUNTS['E10']) + 1
+    status = POOLS_E13["exemp_status"][(i - 1) % len(POOLS_E13["exemp_status"])]
+    return f"({i}, {ex_id}, {comp_id}, {order_id}, '2026-05-02'::date, 7, '{status}')"
+
+def generate_E14_row(i):
+    cfg_id = ((i - 1) % COUNTS['E11']) + 1
+    bld_num = f"BLD-{i:05d}" # Уникальный номер сборки
+    comps = POOLS_E14["installed_components"][(i - 1) % len(POOLS_E14["installed_components"])]
+    asm = POOLS_E14["assembler"][(i - 1) % len(POOLS_E14["assembler"])]
+    status = POOLS_E14["build_status"][(i - 1) % len(POOLS_E14["build_status"])]
+    return f"({i}, {cfg_id}, '{bld_num}', '2026-05-03'::date, '{comps}', '{asm}', NULL, '{status}', NULL)"
+
+def generate_E15_row(i):
+    bld_id = ((i - 1) % COUNTS['E14']) + 1
+    status = POOLS_E15["test_status"][(i - 1) % len(POOLS_E15["test_status"])]
+    return f"({i}, {bld_id}, '{status}', NULL, '2026-05-04'::date)"
+
+def generate_E16_row(i):
+    test_id = ((i - 1) % COUNTS['E15']) + 1
+    tname = POOLS_E16["test_name"][(i - 1) % len(POOLS_E16["test_name"])]
+    status = POOLS_E16["test_status"][(i - 1) % len(POOLS_E16["test_status"])]
+    return f"({i}, {test_id}, '{tname} #{i}', '2026-05-04'::date, '{status}')"
+
+def generate_E17_row(i):
+    order_id = ((i - 1) % COUNTS['E10']) + 1
+    build_id = ((i - 1) % COUNTS['E14']) + 1
+    sale_num = f"SALE-{i:05d}" # Уникальный номер продажи
+    name = POOLS_E17["customer_name"][(i - 1) % len(POOLS_E17["customer_name"])]
+    cost = 80000.0 + i * 1200
+    resp = POOLS_E17["responsible_person"][(i - 1) % len(POOLS_E17["responsible_person"])]
+    status = POOLS_E17["sale_status"][(i - 1) % len(POOLS_E17["sale_status"])]
+    return f"({i}, {order_id}, {build_id}, '{sale_num}', '2026-05-05'::date, '{name}', {cost}, '{resp}', '{status}')"
+
+def generate_E18_row(i):
+    sale_id = ((i - 1) % COUNTS['E17']) + 1
+    build_id = ((i - 1) % COUNTS['E14']) + 1
+    ex_id = ((i - 1) % COUNTS['E9']) + 1
+    warr_num = f"WARR-{i:05d}" # Уникальный номер гарантии
+    desc = POOLS_E18["warr_description"][(i - 1) % len(POOLS_E18["warr_description"])]
+    terms = POOLS_E18["warranty_terms"][(i - 1) % len(POOLS_E18["warranty_terms"])]
+    status = POOLS_E18["warr_status"][(i - 1) % len(POOLS_E18["warr_status"])]
+    reason = POOLS_E18["reason"][(i - 1) % len(POOLS_E18["reason"])]
+    name = POOLS_E18["customer_name"][(i - 1) % len(POOLS_E18["customer_name"])]
+    return f"({i}, {sale_id}, {build_id}, {ex_id}, '{warr_num}', '{desc}', '{terms}', '{status}', '{reason}', '2026-06-01'::date, '{name}')"
+
+def generate_E19_row(i):
+    b_id = ((i - 1) % COUNTS['E8']) + 1
+    m_id = ((i - 1) % COUNTS['E1']) + 1
+    return f"({b_id}, {m_id})"
+
+def generate_E20_row(i):
+    bld_id = ((i - 1) % COUNTS['E14']) + 1
+    ex_id = ((i - 1) % COUNTS['E9']) + 1
+    return f"({bld_id}, {ex_id})"
+
+def generate_E21_row(i):
+    ex_id = ((i - 1) % COUNTS['E9']) + 1
+    sale_id = ((i - 1) % COUNTS['E17']) + 1
+    return f"({ex_id}, {sale_id})"
+
 
 def generate_sql():
-    lines = []
-    lines.append("SET search_path TO dhcp_store, public;\n")
-    base_date = datetime.now() - timedelta(days=90)
+    lines = ["SET search_path TO dhcp_store, public;\n"]
 
-    suppliers_pool = [
-        ("ООО \"ТехноТрейд\"", "order@technotrade.ru", "ИНН 7701234567"),
-        ("АО \"Электроника Опт\"", "info@elopt.ru", "ИНН 7802987654"),
-        ("ООО \"МСК Комплект\"", "b2b@mskcomp.ru", "ИНН 7712345678"),
-        ("ИП Смирнов А.В.", "smirrov@mail.ru", "ИНН 500123456789"),
-        ("ТД \"ПромЭлектроника\"", "sales@promelec.ru", "ИНН 6671234567")
-    ]
-    
-    mfr_by_category = {
-        1: ["Intel", "AMD"],
-        2: ["NVIDIA", "AMD", "ASUS", "MSI", "Gigabyte"],
-        3: ["Kingston", "Corsair", "G.Skill", "Crucial", "TeamGroup"],
-        4: ["ASUS", "MSI", "Gigabyte", "ASRock"],
-        5: ["Seasonic", "Be Quiet!", "Corsair", "DeepCool", "MSI"],
-        6: ["Kingston", "Corsair", "G.Skill", "Crucial"],
-        7: ["Kingston", "Corsair", "G.Skill", "TeamGroup"],
-        8: ["ASUS", "MSI", "Gigabyte"],
-        9: ["ASUS", "MSI", "ASRock"]
-    }
-    
-    clients = [
-        ("Александр Иванов", "alex.ivanov@gmail.com"),
-        ("Екатерина Смирнова", "katrin_s@yandex.ru"),
-        ("Дмитрий Петров", "dpetrov@mail.ru"),
-        ("Ольга Васильева", "olga.v@tech-user.org"),
-        ("Максим Ковалев", "max_kov@bk.ru"),
-        ("Анна Морозова", "morozova_anna@gmail.com")
+    tables_config = [
+        ('E2', 'category', "category_id, parent_category_id, cat_code, cat_name, cat_description", generate_E2_row, True),
+        ('E6', 'supplier', "supplier_id, sup_name, contact_info, requisites, sup_status", generate_E6_row, True),
+        ('E1', 'component_model', "model_id, category_id, articul, comp_name, manufacturer, price, warranty_period", generate_E1_row, True),
+        ('E3', 'characteristic', "characteristic_id, category_id, value_type, charac_name, is_required, unit", generate_E3_row, True),
+        ('E4', 'characteristic_value', "model_id, characteristic_id, charac_value", generate_E4_row, False),
+        ('E5', 'compability_rule', "rule_id, category_id, comp_name, argument_1, comparator, argument_2, related_category_id, comp_status, created_at, deprecated_at, error_image", generate_E5_row, True),
+        ('E7', 'supply', "supply_id, supplier_id, arrival_date, total_cost, responsible_person, sup_status, sup_comment", generate_E7_row, True),
+        ('E8', 'batch', "batch_id, model_id, supply_id, arrival_date, quantity, batch_status, purchase_price, current_stock", generate_E8_row, True),
+        ('E9', 'exemplar', "exemplar_id, batch_id, serial_number, arrival_date, exemp_location, exemp_status", generate_E9_row, True),
+        ('E11', 'build_configuration', "configuration_id, prev_version_id, component_list, build_status, customer_order_ref, compatibility_check_result", generate_E11_row, True),
+        ('E10', 'customer_order', "order_id, configuration_id, cust_number, order_date, responsible_person, cust_cost, cust_status, cust_comment, customer_name, contact_info", generate_E10_row, True),
+        ('E12', 'configuration_component', "component_id, configuration_id, model_id", generate_E12_row, True),
+        ('E13', 'exemplar_reservation', "reservation_id, exemplar_id, component_id, order_id, created_at, validity_period, exemp_status", generate_E13_row, True),
+        ('E14', 'build', "build_id, configuration_id, build_number, build_date, installed_components, assembler, build_test_info, build_status, build_comment", generate_E14_row, True),
+        ('E15', 'build_test', "test_id, build_id, test_status, build_comment, test_date", generate_E15_row, True),
+        ('E16', 'test_result', "test_result_id, test_id, test_name, result_date, test_status", generate_E16_row, True),
+        ('E17', 'sale', "sale_id, order_id, build_id, sale_number, sale_date, customer_name, sale_cost, responsible_person, sale_status", generate_E17_row, True),
+        ('E18', 'warranty_claim', "claim_id, sale_id, build_id, exemplar_id, warr_number, warr_description, warranty_terms, warr_status, reason, claim_date, customer_name", generate_E18_row, True),
+        ('E19', 'batch_item', "batch_id, model_id", generate_E19_row, False),
+        ('E20', 'build_item', "build_id, exemplar_id", generate_E20_row, False),
+        ('E21', 'sale_item', "exemplar_id, sale_id", generate_E21_row, False)
     ]
 
-    engineers = ["Инженер Смит", "Мастер Джонс", "Техник Гарсия", "Специалист Вонг"]
-    test_names = ["AIDA64 FPU Stress", "FurMark Benchmark", "Prime95 Blend", "MemTest86 Pro", "OCCT Power Test"]
+    for key, table_name, columns, gen_func, has_identity in tables_config:
+        n = COUNTS[key]
+        lines.append(f"-- {key}: {table_name}")
+        
+        insert_prefix = f"INSERT INTO {table_name} ({columns})"
+        if has_identity:
+            insert_prefix += " OVERRIDING SYSTEM VALUE"
+        insert_prefix += " VALUES"
 
-    lines.append("-- E6: supplier")
-    e6_vals = []
-    for i in range(1, E6_SUPPLIERS_QUANTITY + 1):
-        name, info, req = suppliers_pool[(i - 1) % len(suppliers_pool)]
-        full_name = f"{name} #{i}"
-        e6_vals.append(f"({i}, '{esc(full_name)}', '{esc(info)}', '{esc(req)}', 'active')")
-    
-    lines.append(
-        "INSERT INTO supplier (supplier_id, sup_name, contact_info, requisites, sup_status) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e6_vals) + 
-        "\nON CONFLICT (supplier_id) DO NOTHING;\n"
-    )
+        rows = [gen_func(i) for i in range(1, n + 1)]
+        
+        conflict_keys = []
+        if key == 'E1': conflict_keys = ["model_id"]
+        elif key == 'E2': conflict_keys = ["category_id"]
+        elif key == 'E3': conflict_keys = ["characteristic_id"]
+        elif key == 'E4': conflict_keys = ["model_id", "characteristic_id"]
+        elif key == 'E5': conflict_keys = ["rule_id"]
+        elif key == 'E6': conflict_keys = ["supplier_id"]
+        elif key == 'E7': conflict_keys = ["supply_id"]
+        elif key == 'E8': conflict_keys = ["batch_id"]
+        elif key == 'E9': conflict_keys = ["exemplar_id"]
+        elif key == 'E10': conflict_keys = ["order_id"]
+        elif key == 'E11': conflict_keys = ["configuration_id"]
+        elif key == 'E12': conflict_keys = ["component_id"]
+        elif key == 'E13': conflict_keys = ["reservation_id"]
+        elif key == 'E14': conflict_keys = ["build_id"]
+        elif key == 'E15': conflict_keys = ["test_id"]
+        elif key == 'E16': conflict_keys = ["test_result_id"]
+        elif key == 'E17': conflict_keys = ["sale_id"]
+        elif key == 'E18': conflict_keys = ["claim_id"]
+        elif key == 'E19': conflict_keys = ["batch_id", "model_id"]
+        elif key == 'E20': conflict_keys = ["build_id", "exemplar_id"]
+        elif key == 'E21': conflict_keys = ["exemplar_id", "sale_id"]
 
-    lines.append("-- E1: component_model")
-    e1_vals = []
-    for i in range(1, E1_MODELS_QUANTITY + 1):
-        cat_id = random.randint(1, E2_CATEGORIES_QUANTITY)
-        mfrs = mfr_by_category.get(cat_id, ["Generic Mfr"])
-        mfr = random.choice(mfrs)
-        art = f"ART-{cat_id}-{i:04d}"
-        name = f"{mfr} Model Line X-{i}"
-        price = random.randint(4000, 180000)
-        e1_vals.append(f"({i}, {cat_id}, '{esc(art)}', '{esc(name)}', '{esc(mfr)}', {price})")
-    
-    lines.append(
-        "INSERT INTO component_model (model_id, category_id, articul, comp_name, manufacturer, price) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e1_vals) + 
-        "\nON CONFLICT (model_id) DO NOTHING;\n"
-    )
+        conflict_clause = f"ON CONFLICT ({', '.join(conflict_keys)}) DO NOTHING;\n" if conflict_keys else ";"
 
-    lines.append("-- E3: characteristic")
-    char_defs = [
-        (1, 1, 'TEXT', 'Сокет', 'TRUE', 'NULL'),
-        (2, 1, 'NUMERIC', 'TDP', 'TRUE', "'Вт'"),
-        (3, 2, 'NUMERIC', 'Объем VRAM', 'TRUE', "'ГБ'"),
-        (4, 3, 'NUMERIC', 'Частота', 'TRUE', "'МГц'"),
-        (5, 4, 'TEXT', 'Форм-фактор', 'TRUE', 'NULL'),
-        (6, 5, 'NUMERIC', 'Мощность', 'TRUE', "'Вт'")
-    ]
-    e3_vals = []
-    for cid, cat_id, vtype, cname, req, unit in char_defs[:E3_CHARACTERISTICS_QUANTITY]:
-        e3_vals.append(f"({cid}, {cat_id}, '{esc(vtype)}', '{esc(cname)}', {req}, {unit})")
-    
-    lines.append(
-        "INSERT INTO characteristic (characteristic_id, category_id, value_type, charac_name, is_required, unit) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e3_vals) + 
-        "\nON CONFLICT (characteristic_id) DO NOTHING;\n"
-    )
+        stmt = f"{insert_prefix}\n" + ",\n".join(rows) + f"\n{conflict_clause}\n"
+        lines.append(stmt)
 
-    lines.append("-- E4: characteristic_value")
-    e4_vals = []
-    added_cv = set()
-    for _ in range(E4_CHAR_VALUES_QUANTITY):
-        m_id = random.randint(1, E1_MODELS_QUANTITY)
-        c_id = random.randint(1, E3_CHARACTERISTICS_QUANTITY)
-        if (m_id, c_id) in added_cv:
-            continue
-        added_cv.add((m_id, c_id))
-        val = random.choice([8, 16, 32, 65, 95, 125, 3200, 4800, 5600, 650, 750, 850])
-        e4_vals.append(f"({m_id}, {c_id}, {val})")
-    
-    lines.append(
-        "INSERT INTO characteristic_value (model_id, characteristic_id, charac_value) VALUES\n" + 
-        ",\n".join(e4_vals) + "\nON CONFLICT (model_id, characteristic_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E5: compability_rule")
-    rules = [
-        (1, 1, 'CPU_MOBO_SOCKET_CHECK', 'socket', '=', 'socket', 4, 'active'),
-        (2, 4, 'MOBO_RAM_TYPE_CHECK', 'memory_type', '=', 'memory_type', 3, 'active'),
-        (3, 5, 'PSU_POWER_CHECK', 'total_tdp', '<=', 'max_power', 1, 'active')
-    ]
-    e5_vals = []
-    for r in rules[:E5_COMP_RULES_QUANTITY]:
-        e5_vals.append(f"({r[0]}, {r[1]}, '{esc(r[2])}', '{esc(r[3])}', '{esc(r[4])}', '{esc(r[5])}', {r[6]}, '{esc(r[7])}')")
-    
-    lines.append(
-        "INSERT INTO compability_rule (rule_id, category_id, comp_name, argument_1, comparator, argument_2, related_category_id, comp_status) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e5_vals) + 
-        "\nON CONFLICT (rule_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E7: supply")
-    e7_vals = []
-    for i in range(1, E7_SUPPLIES_QUANTITY + 1):
-        d = (base_date + timedelta(days=i * 4)).strftime('%Y-%m-%d')
-        sup_id = random.randint(1, E6_SUPPLIERS_QUANTITY)
-        cost = random.randint(150000, 1200000)
-        resp = random.choice(engineers)
-        e7_vals.append(f"({i}, {sup_id}, '{d}', {cost}, '{esc(resp)}', 'received')")
-    
-    lines.append(
-        "INSERT INTO supply (supply_id, supplier_id, arrival_date, total_cost, responsible_person, sup_status) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e7_vals) + 
-        "\nON CONFLICT (supply_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E8: batch")
-    e8_vals = []
-    for i in range(1, E8_BATCHES_QUANTITY + 1):
-        m_id = random.randint(1, E1_MODELS_QUANTITY)
-        sup_id = random.randint(1, E7_SUPPLIES_QUANTITY)
-        d = (base_date + timedelta(days=sup_id * 4)).strftime('%Y-%m-%d')
-        qty = E9_EXEMPLARS_QUANTITY // E8_BATCHES_QUANTITY
-        price = random.randint(3000, 90000)
-        e8_vals.append(f"({i}, {m_id}, {sup_id}, '{d}', {qty}, {price}, {qty})")
-    
-    lines.append(
-        "INSERT INTO batch (batch_id, model_id, supply_id, arrival_date, quantity, purchase_price, current_stock) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e8_vals) + 
-        "\nON CONFLICT (batch_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E9: exemplar")
-    e9_vals = []
-    per_batch = E9_EXEMPLARS_QUANTITY // E8_BATCHES_QUANTITY
-    curr_batch = 1
-    count_in_batch = 0
-    for i in range(1, E9_EXEMPLARS_QUANTITY + 1):
-        serial = random.randint(10000000, 99999999)
-        d = base_date.strftime('%Y-%m-%d')
-        e9_vals.append(f"({i}, {curr_batch}, {serial}, '{d}', 'in_stock')")
-        count_in_batch += 1
-        if count_in_batch >= per_batch and curr_batch < E8_BATCHES_QUANTITY:
-            curr_batch += 1
-            count_in_batch = 0
-    
-    lines.append(
-        "INSERT INTO exemplar (exemplar_id, batch_id, serial_number, arrival_date, exemp_status) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e9_vals) + 
-        "\nON CONFLICT (exemplar_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E11: build_configuration")
-    e11_vals = []
-    for i in range(1, E11_CONFIGS_QUANTITY + 1):
-        e11_vals.append(f"({i}, NULL, 'ready', 'REF-2026-{i:03d}')")
-    
-    lines.append(
-        "INSERT INTO build_configuration (configuration_id, prev_version_id, build_status, customer_order_ref) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e11_vals) + 
-        "\nON CONFLICT (configuration_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E10: customer_order")
-    e10_vals = []
-    for i in range(1, E10_ORDERS_QUANTITY + 1):
-        d = (base_date + timedelta(days=i * 2)).strftime('%Y-%m-%d')
-        cfg_id = ((i - 1) % E11_CONFIGS_QUANTITY) + 1
-        client_name, client_email = random.choice(clients)
-        cost = random.randint(45000, 280000)
-        e10_vals.append(f"({i}, {cfg_id}, 'ORD-{i:04d}', '{d}', {cost}, 'completed', '{esc(client_name)}', '{esc(client_email)}')")
-    
-    lines.append(
-        "INSERT INTO customer_order (order_id, configuration_id, cust_number, order_date, cust_cost, cust_status, customer_name, contact_info) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e10_vals) + 
-        "\nON CONFLICT (order_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E12: configuration_component")
-    e12_vals = []
-    for i in range(1, E12_CONFIG_COMPS_QUANTITY + 1):
-        cfg_id = random.randint(1, E11_CONFIGS_QUANTITY)
-        m_id = random.randint(1, E1_MODELS_QUANTITY)
-        e12_vals.append(f"({i}, {cfg_id}, {m_id})")
-    
-    lines.append(
-        "INSERT INTO configuration_component (component_id, configuration_id, model_id) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e12_vals) + 
-        "\nON CONFLICT (component_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E13: exemplar_reservation")
-    e13_vals = []
-    for i in range(1, E13_RESERVATIONS_QUANTITY + 1):
-        ex_id = random.randint(1, E9_EXEMPLARS_QUANTITY)
-        comp_id = random.randint(1, E12_CONFIG_COMPS_QUANTITY)
-        ord_id = random.randint(1, E10_ORDERS_QUANTITY)
-        e13_vals.append(f"({i}, {ex_id}, {comp_id}, {ord_id}, 7, 'active')")
-    
-    lines.append(
-        "INSERT INTO exemplar_reservation (reservation_id, exemplar_id, component_id, order_id, validity_period, exemp_status) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e13_vals) + 
-        "\nON CONFLICT (reservation_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E14: build")
-    e14_vals = []
-    for i in range(1, E14_BUILDS_QUANTITY + 1):
-        d = (base_date + timedelta(days=i * 2 + 1)).strftime('%Y-%m-%d')
-        cfg_id = ((i - 1) % E11_CONFIGS_QUANTITY) + 1
-        assembler = random.choice(engineers)
-        e14_vals.append(f"({i}, {cfg_id}, 'BLD-{i:04d}', '{d}', 'completed', '{esc(assembler)}')")
-    
-    lines.append(
-        "INSERT INTO build (build_id, configuration_id, build_number, build_date, build_status, assembler) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e14_vals) + 
-        "\nON CONFLICT (build_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E15: build_test")
-    e15_vals = []
-    for i in range(1, E15_TESTS_QUANTITY + 1):
-        d = (base_date + timedelta(days=i * 2 + 2)).strftime('%Y-%m-%d')
-        bld_id = ((i - 1) % E14_BUILDS_QUANTITY) + 1
-        e15_vals.append(f"({i}, {bld_id}, 'passed', '{d}')")
-    
-    lines.append(
-        "INSERT INTO build_test (test_id, build_id, build_status, test_date) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e15_vals) + 
-        "\nON CONFLICT (test_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E16: test_result")
-    e16_vals = []
-    for i in range(1, E16_TEST_RESULTS_QUANTITY + 1):
-        d = (base_date + timedelta(days=i * 2 + 2)).strftime('%Y-%m-%d')
-        t_id = random.randint(1, E15_TESTS_QUANTITY)
-        t_name = random.choice(test_names)
-        e16_vals.append(f"({i}, {t_id}, '{esc(t_name)}', '{d}', 'success')")
-    
-    lines.append(
-        "INSERT INTO test_result (test_result_id, test_id, test_name, result_date, test_status) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e16_vals) + 
-        "\nON CONFLICT (test_result_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E17: sale")
-    e17_vals = []
-    for i in range(1, E17_SALES_QUANTITY + 1):
-        d = (base_date + timedelta(days=i * 3 + 3)).strftime('%Y-%m-%d')
-        ord_id = ((i - 1) % E10_ORDERS_QUANTITY) + 1
-        bld_id = ((i - 1) % E14_BUILDS_QUANTITY) + 1
-        client_name, _ = random.choice(clients)
-        cost = random.randint(50000, 300000)
-        e17_vals.append(f"({i}, {ord_id}, {bld_id}, 'SALE-{i:04d}', '{d}', '{esc(client_name)}', {cost}, 'completed')")
-    
-    lines.append(
-        "INSERT INTO sale (sale_id, order_id, build_id, sale_number, sale_date, customer_name, sale_cost, sale_status) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e17_vals) + 
-        "\nON CONFLICT (sale_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E18: warranty_claim")
-    e18_vals = []
-    reasons = ["Дефект питания", "Артефакты GPU", "Не запускается память", "Перегрев CPU"]
-    for i in range(1, E18_WARRANTY_CLAIMS_QUANTITY + 1):
-        d = (base_date + timedelta(days=i * 5 + 10)).strftime('%Y-%m-%d')
-        sale_id = random.randint(1, E17_SALES_QUANTITY)
-        bld_id = random.randint(1, E14_BUILDS_QUANTITY)
-        ex_id = random.randint(1, E9_EXEMPLARS_QUANTITY)
-        reason = random.choice(reasons)
-        client_name, _ = random.choice(clients)
-        e18_vals.append(f"({i}, {sale_id}, {bld_id}, {ex_id}, 'WARR-{i:04d}', 'open', '{esc(reason)}', '{d}', '{esc(client_name)}')")
-    
-    lines.append(
-        "INSERT INTO warranty_claim (claim_id, sale_id, build_id, exemplar_id, warr_number, warr_status, reason, claim_date, customer_name) "
-        "OVERRIDING SYSTEM VALUE VALUES\n" + ",\n".join(e18_vals) + 
-        "\nON CONFLICT (claim_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E19: batch_item")
-    e19_vals = []
-    for i in range(1, E19_BATCH_ITEMS_QUANTITY + 1):
-        b_id = i
-        m_id = random.randint(1, E1_MODELS_QUANTITY)
-        e19_vals.append(f"({b_id}, {m_id})")
-    
-    lines.append(
-        "INSERT INTO batch_item (batch_id, model_id) VALUES\n" + ",\n".join(e19_vals) + 
-        "\nON CONFLICT (batch_id, model_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E20: build_item")
-    e20_vals = []
-    for i in range(1, E20_BUILD_ITEMS_QUANTITY + 1):
-        bld_id = i
-        ex_id = random.randint(1, E9_EXEMPLARS_QUANTITY)
-        e20_vals.append(f"({bld_id}, {ex_id})")
-    
-    lines.append(
-        "INSERT INTO build_item (build_id, exemplar_id) VALUES\n" + ",\n".join(e20_vals) + 
-        "\nON CONFLICT (build_id, exemplar_id) DO NOTHING;\n"
-    )
-
-    lines.append("-- E21: sale_item")
-    e21_vals = []
-    for i in range(1, E21_SALE_ITEMS_QUANTITY + 1):
-        sale_id = i
-        ex_id = random.randint(1, E9_EXEMPLARS_QUANTITY)
-        e21_vals.append(f"({ex_id}, {sale_id})")
-    
-    lines.append(
-        "INSERT INTO sale_item (exemplar_id, sale_id) VALUES\n" + ",\n".join(e21_vals) + 
-        "\nON CONFLICT (exemplar_id, sale_id) DO NOTHING;"
-    )
-
+    os.makedirs(os.path.dirname(OUTPUT_SQL_PATH), exist_ok=True)
     with open(OUTPUT_SQL_PATH, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
     
