@@ -1,5 +1,5 @@
 -- E2
-CREATE TABLE category (
+CREATE TABLE dhcp_store.category (
     category_id INT GENERATED ALWAYS AS IDENTITY,
     parent_category_id INT,
     cat_code VARCHAR(80) NOT NULL,
@@ -10,11 +10,11 @@ CREATE TABLE category (
     CONSTRAINT uk_category_cat_code UNIQUE (cat_code),
     CONSTRAINT fk_category_parent
         FOREIGN KEY (parent_category_id)
-        REFERENCES category (category_id)
+        REFERENCES dhcp_store.category (category_id)
 );
 
 -- E1
-CREATE TABLE component_model (
+CREATE TABLE dhcp_store.component_model (
     model_id INT GENERATED ALWAYS AS IDENTITY,
     category_id INT NOT NULL,
     articul VARCHAR(80) NOT NULL,
@@ -27,10 +27,10 @@ CREATE TABLE component_model (
     CONSTRAINT uk_component_model_articul UNIQUE (articul),
     CONSTRAINT fk_component_model_category
         FOREIGN KEY (category_id)
-        REFERENCES category (category_id)
+        REFERENCES dhcp_store.category (category_id)
 );
 
-CREATE TABLE characteristic (
+CREATE TABLE dhcp_store.characteristic (
     characteristic_id INT GENERATED ALWAYS AS IDENTITY,
     category_id INT NOT NULL,
     value_type VARCHAR(80) NOT NULL,
@@ -41,11 +41,11 @@ CREATE TABLE characteristic (
     CONSTRAINT pk_characteristic PRIMARY KEY (characteristic_id),
     CONSTRAINT fk_characteristic_category
         FOREIGN KEY (category_id)  
-        REFERENCES category (category_id)
+        REFERENCES dhcp_store.category (category_id)
 );
 
 -- E4
-CREATE TABLE characteristic_value (
+CREATE TABLE dhcp_store.characteristic_value (
     model_id INT NOT NULL,
     characteristic_id INT NOT NULL,
     charac_value NUMERIC (12, 2),
@@ -53,15 +53,15 @@ CREATE TABLE characteristic_value (
     CONSTRAINT pk_characteristic_value PRIMARY KEY (model_id, characteristic_id),
     CONSTRAINT fk_characteristic_value_model
         FOREIGN KEY (model_id)
-        REFERENCES component_model (model_id),
+        REFERENCES dhcp_store.component_model (model_id),
 
     CONSTRAINT fk_characteristic_value_characteristic
         FOREIGN KEY (characteristic_id)
-        REFERENCES characteristic (characteristic_id)
+        REFERENCES dhcp_store.characteristic (characteristic_id)
 );
 
 -- E5
-CREATE TABLE compability_rule (
+CREATE TABLE dhcp_store.compability_rule (
     rule_id INT GENERATED ALWAYS AS IDENTITY,
     category_id INT NOT NULL,
     comp_name VARCHAR(300) NOT NULL,
@@ -70,18 +70,18 @@ CREATE TABLE compability_rule (
     argument_2 VARCHAR(300) NOT NULL,
     related_category_id INT,
     comp_status VARCHAR(20) NOT NULL DEFAULT 'active'CHECK (comp_status IN ('active', 'deprecated', 'draft')),
-    created_at DATE NOT NULL DEFAULT CURRENT_DATE,
+    created_at DATE NOT NULL DEFAULT CURRENT_DATE, --TIMESTAMP (ИЗМЕНИТЬ DATA на TIMESTAMP)
     deprecated_at DATE,
     error_image VARCHAR(200),
 
     CONSTRAINT pk_compatibility_rule PRIMARY KEY (rule_id),
     CONSTRAINT fk_compatibility_rule_category
         FOREIGN KEY (category_id)
-        REFERENCES category (category_id),
+        REFERENCES dhcp_store.category (category_id),
 
     CONSTRAINT fk_compatibility_rule_related_category
         FOREIGN KEY (related_category_id)
-        REFERENCES category (category_id),
+        REFERENCES dhcp_store.category (category_id),
 
     CONSTRAINT chk_compatibility_rule_dates
         CHECK (deprecated_at IS NULL OR deprecated_at >= created_at)

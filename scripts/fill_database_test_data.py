@@ -7,27 +7,27 @@ OUTPUT_SQL_PATH = os.path.join(BASE_DIR, "database", "init", "generated_test_dat
 
 # Теперь можно смело ставить любое количество строк без риска дубликатов
 COUNTS = {
-    'E1': 1000,
-    'E2': 1000, 
-    'E3': 1000,
-    'E4': 1000,
-    'E5': 1000,
-    'E6': 1000, 
-    'E7': 1000, 
-    'E8': 1000, 
-    'E9': 1000, 
-    'E10': 1000,
-    'E11': 1000, 
-    'E12': 1000, 
-    'E13': 1000, 
-    'E14': 1000, 
-    'E15': 1000,
-    'E16': 1000, 
-    'E17': 1000, 
-    'E18': 1000, 
-    'E19': 1000, 
-    'E20': 1000, 
-    'E21': 1000
+    'E1': 100,
+    'E2': 100, 
+    'E3': 100,
+    'E4': 100,
+    'E5': 100,
+    'E6': 100, 
+    'E7': 100, 
+    'E8': 100, 
+    'E9': 100, 
+    'E10': 100,
+    'E11': 100, 
+    'E12': 100, 
+    'E13': 100, 
+    'E14': 100, 
+    'E15': 100,
+    'E16': 100, 
+    'E17': 100, 
+    'E18': 100, 
+    'E19': 100, 
+    'E20': 100, 
+    'E21': 100
 }
 
 # Расширенные статические пулы данных для всех сущностей (E1 - E18)
@@ -348,7 +348,7 @@ def generate_sql():
         n = COUNTS[key]
         lines.append(f"-- {key}: {table_name}")
         
-        insert_prefix = f"INSERT INTO {table_name} ({columns})"
+        insert_prefix = f"INSERT INTO dhcp_store.{table_name} ({columns})"
         if has_identity:
             insert_prefix += " OVERRIDING SYSTEM VALUE"
         insert_prefix += " VALUES"

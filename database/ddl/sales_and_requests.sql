@@ -1,5 +1,5 @@
 -- E14
-CREATE TABLE build (
+CREATE TABLE dhcp_store.build (
     build_id INT GENERATED ALWAYS AS IDENTITY,
     configuration_id INT NOT NULL,
     build_number VARCHAR(80) NOT NULL,
@@ -13,11 +13,11 @@ CREATE TABLE build (
     CONSTRAINT uk_build_number UNIQUE (build_number),
     CONSTRAINT fk_build_configuration
         FOREIGN KEY (configuration_id)
-        REFERENCES build_configuration (configuration_id)
+        REFERENCES dhcp_store.build_configuration (configuration_id)
 );
 
 -- E15
-CREATE TABLE build_test (
+CREATE TABLE dhcp_store.build_test (
     test_id INT GENERATED ALWAYS AS IDENTITY,
     build_id INT NOT NULL,
     test_status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (test_status IN ('pending', 'running', 'passed', 'failed', 'error')),
@@ -26,11 +26,11 @@ CREATE TABLE build_test (
     CONSTRAINT pk_build_test PRIMARY KEY (test_id),
     CONSTRAINT fk_build_test_build
         FOREIGN KEY (build_id)
-        REFERENCES build (build_id)
+        REFERENCES dhcp_store.build (build_id)
 );
 
 -- E16
-CREATE TABLE test_result (
+CREATE TABLE dhcp_store.test_result (
     test_result_id INT GENERATED ALWAYS AS IDENTITY,
     test_id INT NOT NULL,
     test_name VARCHAR(80) NOT NULL,
@@ -39,19 +39,19 @@ CREATE TABLE test_result (
     CONSTRAINT pk_test_result PRIMARY KEY (test_result_id),
     CONSTRAINT fk_test_result_test
         FOREIGN KEY (test_id)
-        REFERENCES build_test (test_id)
+        REFERENCES dhcp_store.build_test (test_id)
 );
 
 -- E20
-CREATE TABLE build_item (
+CREATE TABLE dhcp_store.build_item (
     build_id INT NOT NULL,
     exemplar_id INT NOT NULL,
     CONSTRAINT pk_build_item PRIMARY KEY (build_id, exemplar_id),
     CONSTRAINT fk_build_item_build
         FOREIGN KEY (build_id)
-        REFERENCES build (build_id),
+        REFERENCES dhcp_store.build (build_id),
 
     CONSTRAINT fk_build_item_exemplar
         FOREIGN KEY (exemplar_id)
-        REFERENCES exemplar (exemplar_id)
+        REFERENCES dhcp_store.exemplar (exemplar_id)
 );

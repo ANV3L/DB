@@ -1,5 +1,5 @@
 -- E6
-CREATE TABLE supplier (
+CREATE TABLE dhcp_store.supplier (
     supplier_id INT GENERATED ALWAYS AS IDENTITY,
     sup_name VARCHAR(80) NOT NULL,
     contact_info VARCHAR(250),
@@ -9,7 +9,7 @@ CREATE TABLE supplier (
 );
 
 -- E7
-CREATE TABLE supply (
+CREATE TABLE dhcp_store.supply (
     supply_id INT GENERATED ALWAYS AS IDENTITY,
     supplier_id INT NOT NULL,
     arrival_date DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -21,11 +21,11 @@ CREATE TABLE supply (
     CONSTRAINT pk_supply PRIMARY KEY (supply_id),
     CONSTRAINT fk_supply_supplier
         FOREIGN KEY (supplier_id)
-        REFERENCES supplier (supplier_id)
+        REFERENCES dhcp_store.supplier (supplier_id)
 );
 
 -- E8
-CREATE TABLE batch (
+CREATE TABLE dhcp_store.batch (
     batch_id INT GENERATED ALWAYS AS IDENTITY,
     model_id INT NOT NULL,
     supply_id INT NOT NULL,
@@ -37,15 +37,15 @@ CREATE TABLE batch (
     CONSTRAINT pk_batch PRIMARY KEY (batch_id),
     CONSTRAINT fk_batch_model
         FOREIGN KEY (model_id)
-        REFERENCES component_model (model_id),
+        REFERENCES dhcp_store.component_model (model_id),
 
     CONSTRAINT fk_batch_supply
         FOREIGN KEY (supply_id)
-        REFERENCES supply (supply_id)
+        REFERENCES dhcp_store.supply (supply_id)
 );
 
 -- E9
-CREATE TABLE exemplar (
+CREATE TABLE dhcp_store.exemplar (
     exemplar_id INT GENERATED ALWAYS AS IDENTITY,
     batch_id INT NOT NULL,
     serial_number VARCHAR(80) NOT NULL,
@@ -56,19 +56,19 @@ CREATE TABLE exemplar (
     CONSTRAINT uk_exemplar_serial UNIQUE (serial_number),
     CONSTRAINT fk_exemplar_batch
         FOREIGN KEY (batch_id)
-        REFERENCES batch (batch_id)
+        REFERENCES dhcp_store.batch (batch_id)
 );
 
 -- E19
-CREATE TABLE batch_item (
+CREATE TABLE dhcp_store.batch_item (
     batch_id INT NOT NULL,
     model_id INT NOT NULL,
     CONSTRAINT pk_batch_item PRIMARY KEY (batch_id, model_id),
     CONSTRAINT fk_batch_item_batch
         FOREIGN KEY (batch_id)
-        REFERENCES batch (batch_id),
+        REFERENCES dhcp_store.batch (batch_id),
 
     CONSTRAINT fk_batch_item_model
         FOREIGN KEY (model_id)
-        REFERENCES component_model (model_id)
+        REFERENCES dhcp_store.component_model (model_id)
 );
